@@ -1,140 +1,225 @@
+
 import math
+from fractions import Fraction
+
 
 class AdvancedFormulaEngine:
+    """
+    Advanced Formula Engine
+    Version: 1.1.0
+
+    Copyright (C) 2026 YOUR NAME
+
+    Licensed under GNU GPLv3.
+    """
+
+    VERSION = "1.1.0"
+    MAX_EXPONENT = 1000
+    MAX_BASE = 100
+
     def __init__(self):
-        """
-        Initializes the Dynamic Modular Formula Engine under GNU GPLv3 protection.
-        """
-        self.version = "1.0.0-Core (GPLv3)"
-        print(f"====================================================")
-        print(f"🌀 INITIALIZING ADVANCED FORMULA ENGINE v{self.version} 🌀")
-        print(f"====================================================")
+        print("=" * 55)
+        print(f"ADVANCED FORMULA ENGINE v{self.VERSION}")
+        print("Mathematical Verification System")
+        print("=" * 55)
+
+    def _validate_integer(self, value, name):
+        if isinstance(value, bool) or not isinstance(value, int):
+            raise TypeError(f"{name} must be an integer")
+
+    def _validate_size(self, n, s=None):
+        if abs(n) > self.MAX_EXPONENT:
+            raise ValueError("Exponent exceeds safety limit")
+
+        if s is not None and abs(s) > self.MAX_BASE:
+            raise ValueError("Base exceeds safety limit")
 
     def verify_complex_mod_model(self, n, s):
-        """
-        CRITICAL FORMULA: f(n,s) = (2^n + 1) mod k
-        with k = (s^n - s + 1) * ((2^n + 1) / s) + s
-        
-        FULL NEGATIVE, POSITIVE & ZERO CRASH PROTECTION INCLUDED.
-        """
-        print(f"\n--- [Complex Mod Verification] n={n}, s={s} ---")
-        
-        # 🛡️ PROTECTION 1: Zero Division Check
-        if s == 0:
-            print("🚨 Crash Avoided: 's' cannot be 0 (Division by Zero)!")
-            return None
-
-        # 🛡️ PROTECTION 2: Negative Base with Float Exponent Check (Complex Number Crash)
-        if s < 0 and isinstance(n, float):
-            print("🚨 Crash Avoided: Negative base with float exponent creates undefined complex domains!")
-            return None
+        print(f"\n[Complex Mod] n={n}, s={s}")
 
         try:
-            # 🛡️ PROTECTION 3: Overflow Prevention for huge numbers
-            if abs(n) > 1000 or (abs(s) > 100 and abs(n) > 50):
-                print("🚨 Crash Avoided: Input values are too large (Memory Overflow risk)!")
-                return None
+            self._validate_integer(n, "n")
+            self._validate_integer(s, "s")
+            self._validate_size(n, s)
 
-            # 1. Base components calculation
-            numerator = (2 ** n) + 1
-            s_power_n = s ** n
-            
-            # 2. Calculating the dynamic base 'k'
-            k = (s_power_n - s + 1) * (numerator / s) + s
-            
-            # 🛡️ PROTECTION 4: Modulo by zero or negative k check
-            if k <= 0:
-                print(f"🚨 Crash Avoided: Generated base 'k' ({k}) is negative or zero. Modulo undefined.")
-                return None
+            if s == 0:
+                raise ZeroDivisionError("s cannot be zero")
 
-            # 3. Final Function f(n,s) = numerator % k
-            result = numerator % k
-            
-            print(f"Generated Base (k)         : {k}")
-            print(f"Formula Output f(n,s)      : {result}")
+            numerator = 2 ** n + 1
+            s_power_n = Fraction(s) ** n
+
+            k = (
+                (s_power_n - s + 1)
+                * Fraction(numerator, s)
+                + s
+            )
+
+            if k == 0:
+                raise ZeroDivisionError("Generated modulus is zero")
+
+            result = Fraction(numerator) % k
+
+            print("Generated k:", k)
+            print("Result:", result)
+
             return result
 
-        except OverflowError:
-            print("🚨 Crash Avoided: Math overflow error handled successfully.")
-            return None
-        except Exception as e:
-            print(f"🚨 Unexpected Error Handled: {e}")
+        except (ValueError, TypeError, ZeroDivisionError) as error:
+            print("Validation error:", error)
             return None
 
     def verify_integer_model(self, n, S, m=1):
-        """ STAGE 1: Basic Integer Model """
-        print(f"\n--- [Stage 1: Integer Verification] n={n}, S={S} ---")
+        print(f"\n[Integer Model] n={n}, S={S}, m={m}")
+
         try:
-            main_number = (2 ** n) + 1
-            k = ((2 ** n) - S + 1) / m
-            if k <= 0:
-                print("🚨 Error: k cannot be negative or zero.")
-                return None
-            remainder = main_number % k
-            print(f"Formula Output (Remainder) : {remainder}")
-            return remainder
-        except Exception as e:
-            print(f"🚨 Error: {e}")
+            self._validate_integer(n, "n")
+            self._validate_integer(S, "S")
+            self._validate_integer(m, "m")
+            self._validate_size(n)
+
+            if m == 0:
+                raise ZeroDivisionError("m cannot be zero")
+
+            main_number = 2 ** n + 1
+            k = Fraction(2 ** n - S + 1, m)
+
+            if k == 0:
+                raise ZeroDivisionError("k cannot be zero")
+
+            result = Fraction(main_number) % k
+
+            print("Generated k:", k)
+            print("Result:", result)
+
+            return result
+
+        except (ValueError, TypeError, ZeroDivisionError) as error:
+            print("Error:", error)
             return None
 
     def verify_rational_model(self, n, S_fraction, m=1):
-        """ STAGE 2: Rational Model """
-        print(f"\n--- [Stage 2: Rational Verification] n={n}, S={S_fraction:.4f} ---")
+        print(f"\n[Rational Model] n={n}")
+
         try:
-            main_number = (2 ** n) + 1
-            k = ((2 ** n) - S_fraction + 1) / m
-            remainder = main_number % k
-            print(f"Formula Output (Remainder)   : {remainder:.4f}")
-            return remainder
-        except Exception as e:
-            print(f"🚨 Error: {e}")
+            self._validate_integer(n, "n")
+            self._validate_integer(m, "m")
+            self._validate_size(n)
+
+            S = Fraction(S_fraction)
+
+            if m == 0:
+                raise ZeroDivisionError("m cannot be zero")
+
+            main_number = 2 ** n + 1
+            k = Fraction(2 ** n + 1, m) - S / m
+
+            if k == 0:
+                raise ZeroDivisionError("k cannot be zero")
+
+            result = Fraction(main_number) % k
+
+            print("S:", S)
+            print("k:", k)
+            print("Result:", result)
+
+            return result
+
+        except (ValueError, TypeError, ZeroDivisionError) as error:
+            print("Error:", error)
             return None
 
-    def verify_irrational_model(self, n_pi, S, m=1):
-        """ STAGE 3: Irrational Model """
-        print(f"\n--- [Stage 3: Irrational Verification] n=π, S={S} ---")
+    def verify_irrational_model(self, S, m=1, precision=50):
+        print(f"\n[Irrational Model] S={S}")
+
         try:
-            main_number = (2 ** n_pi) + 1
-            k = ((2 ** n_pi) - S + 1) / m
-            remainder = main_number % k
-            print(f"Formula Output (Remainder)   : {remainder}")
-            return remainder
-        except Exception as e:
-            print(f"🚨 Error: {e}")
+            from decimal import Decimal, localcontext
+
+            if isinstance(precision, bool) or not isinstance(precision, int):
+                raise TypeError("Precision must be an integer")
+
+            if not 10 <= precision <= 500:
+                raise ValueError("Precision must be between 10 and 500")
+
+            if m == 0:
+                raise ZeroDivisionError("m cannot be zero")
+
+            with localcontext() as ctx:
+                ctx.prec = precision
+
+                two = Decimal(2)
+                pi = Decimal(
+                    "3.14159265358979323846264338327950288419716939937510"
+                )
+
+                main_number = (two ** pi) + 1
+                s_value = Decimal(str(S))
+                k = (main_number - s_value + 1) / Decimal(str(m))
+
+                if k == 0:
+                    raise ZeroDivisionError("k cannot be zero")
+
+                result = main_number % k
+
+                print("Precision:", precision)
+                print("k:", k)
+                print("Result:", result)
+
+                return result
+
+        except (ValueError, TypeError, ZeroDivisionError) as error:
+            print("Error:", error)
             return None
 
-    def verify_trigonometric_wave_model(self, n_degrees, m=1):
-        """ STAGE 4: Trigonometric Wave Model """
-        print(f"\n--- [Stage 4: Trigonometric Wave Verification] n={n_degrees}° ---")
+    def verify_trigonometric_wave_model(self, degrees, m=1):
+        print(f"\n[Trigonometric Model] degrees={degrees}")
+
         try:
-            n_radians = math.radians(n_degrees)
-            S = (math.sin(n_radians) ** 2) + (math.cos(n_radians) ** 2)
-            main_number = (2 ** n_degrees) + 1
-            k = ((2 ** n_degrees) - S + 1) / m
-            remainder = main_number % k
-            print(f"Formula Output (Remainder)   : {remainder}")
-            return remainder
-        except Exception as e:
-            print(f"🚨 Error: {e}")
+            if m == 0:
+                raise ZeroDivisionError("m cannot be zero")
+
+            radians = math.radians(degrees)
+
+            S = (
+                math.sin(radians) ** 2
+                + math.cos(radians) ** 2
+            )
+
+            main_number = 2 ** degrees + 1
+            k = (main_number - S + 1) / m
+
+            if math.isclose(k, 0.0, abs_tol=1e-12):
+                raise ZeroDivisionError("k is approximately zero")
+
+            result = math.fmod(main_number, k)
+
+            print("Trigonometric S:", S)
+            print("Generated k:", k)
+            print("Result:", result)
+
+            return result
+
+        except (ValueError, TypeError, OverflowError,
+                ZeroDivisionError) as error:
+            print("Error:", error)
             return None
 
     def verify_autonomous_inf_model(self, S):
-        """ ENTERPRISE FEATURE - STAGE 5 """
         raise PermissionError(
-            "CRITICAL: Stage 5 Autonomous Engine is restricted to the ENTERPRISE EDITION."
+            "Stage 5 is restricted to Enterprise Edition."
         )
 
+
 if __name__ == "__main__":
+
     engine = AdvancedFormulaEngine()
-    
-    # 🧪 EXHAUSTIVE TESTING WITH POSITIVE, NEGATIVE AND ZERO VALUES
-    engine.verify_complex_mod_model(n=5, s=2)       # Positive Test
-    engine.verify_complex_mod_model(n=-3, s=2)      # Negative Exponent Test
-    engine.verify_complex_mod_model(n=3, s=-2)      # Negative Base Test
-    engine.verify_complex_mod_model(n=-2, s=-2)    # Double Negative Test (Triggers Protection)
-    engine.verify_complex_mod_model(n=10, s=0)      # Zero Base Test (Triggers Protection)
-    engine.verify_complex_mod_model(n=5000, s=200)  # Extreme Value Test (Triggers Protection)
-    
-    # Engine verification blocks
-    engine.verify_integer_model(n=10, S=3)
-    engine.verify_rational_model(n=6, S_fraction=5/3)
+
+    engine.verify_complex_mod_model(5, 2)
+    engine.verify_complex_mod_model(-3, 2)
+    engine.verify_complex_mod_model(3, -2)
+    engine.verify_complex_mod_model(-2, -2)
+    engine.verify_complex_mod_model(10, 0)
+
+    engine.verify_integer_model(10, 3)
+    engine.verify_rational_model(6, Fraction(5, 3))
+    engine.verify_irrational_model(3)
+    engine.verify_trigonometric_wave_model(45)
